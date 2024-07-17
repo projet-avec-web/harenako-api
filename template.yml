@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: harenako-api - Computation and API
+
+Globals:
+  Function:
+    CodeUri: .
+    Runtime: java21
+    Tracing: Active
+    Architectures:
+      - x86_64
+    EventInvokeConfig:
+      MaximumRetryAttempts: 0
+    AutoPublishAlias: live
+    SnapStart:
+      ApplyOn: PublishedVersions
+    VpcConfig:
+      SecurityGroupIds:
+        - !Sub '{{resolve:ssm:/poja/sg/id}}'
+      SubnetIds:
+        - !Sub '{{resolve:ssm:/poja/subnet/private1/id}}'
+        - !Sub '{{resolve:ssm:/poja/subnet/private2/id}}'
+    Environment:
+      Variables:
+        ENV: !Ref Env
+        AWS_SES_SOURCE: noreply@nowhere.com
+        
+        
+        
+        
+        
+
+Parameters:
+  Env:
+    Type: String
+
+Resources:
+  FrontalServerlessRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      BinaryMediaTypes:
+        - "*~1*"
+
+  FrontalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.harenako.api.ApiEventHandler::handleRequest
+      MemorySize: 512
+      Timeout: 30
+      Role: !Sub '{{resolve:ssm:/harenako-api/${Env}/execution/role-arn}}'
+      
+      Events:
+        ApiCall:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            RestApiId:
+              Ref: FrontalServerlessRestApi
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName: !Ref ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+
+  ApiUrlSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Join [ '', [ /harenako-api/, !Ref Env, /api/url ] ]
+      Type: String
+      Value: !Sub "https://${FrontalServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !GetAtt ApiUrlSSM.Value
