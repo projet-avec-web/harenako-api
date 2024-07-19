@@ -23,6 +23,7 @@ Globals:
     Environment:
       Variables:
         ENV: !Ref Env
+        AWS_S3_BUCKET: !Sub '{{resolve:ssm:/harenako-api/${Env}/s3/bucket-name}}'
         AWS_SES_SOURCE: noreply@nowhere.com
         
         
