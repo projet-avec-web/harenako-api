@@ -5,7 +5,7 @@ aurora_min_capacity: null
 aurora_scale_point: null
 aurora_sleep: null
 aws_account_id: '779673422809'
-cli_version: 16.0.3
+cli_version: 16.1.1
 codeartifact_domain_name: ''
 codeartifact_repository_name: ''
 custom_java_deps: poja-custom-java-deps.txt
@@ -44,5 +44,5 @@ with_swagger_ui: 'false'
 worker_batch: 5
 worker_function_1_timeout: 600
 worker_function_2_timeout: 600
-worker_memory: 1024
+worker_memory: 512
 worker_reserved_concurrent_executions_nb: null
