@@ -22,6 +22,14 @@ jacoco {
 repositories {
 
     mavenCentral()
+
+    maven {
+        url 'https://harenako-api-779673422809.d.codeartifact.eu-west-3.amazonaws.com/maven/harenako-app/'
+        credentials {
+            username "aws"
+            password System.env.CODEARTIFACT_AUTH_TOKEN
+        }
+    }
 }
 
 java {
@@ -194,6 +202,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:junit-jupiter:1.19.1'
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
+
+    implementation 'school.hei:patrimoine:1.0-SNAPSHOT'
 
 
 }
