@@ -19,9 +19,12 @@ jacoco {
 
 sonar {
     properties {
+        property "sonar.token", System.env.SONAR_TOKEN
         property "sonar.projectKey", System.env.SONAR_PROJECT_KEY
         property "sonar.host.url", System.env.SONAR_HOST_URL
         property "sonar.organization", System.env.SONAR_ORG
+        property "sonar.coverage.jacoco.xmlReportPaths", "$rootDir/build/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.sources", "src/main/java"
     }
 }
 
@@ -100,11 +103,11 @@ task publishJavaClientToMavenLocal(type: Exec, dependsOn: generateJavaClient) {
 }
 tasks.compileJava.dependsOn publishJavaClientToMavenLocal
 
-
+task runJacocoTasks(dependsOn: ['jacocoTestCoverageVerification', 'jacocoTestReport'])
 test {
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
     useJUnitPlatform()
-    finalizedBy jacocoTestCoverageVerification
+    test.finalizedBy(runJacocoTasks)
 }
 
 jacocoTestCoverageVerification {
@@ -128,6 +131,7 @@ jacocoTestCoverageVerification {
 }
 
 jacocoTestReport {
+    dependsOn test
     reports {
         xml.required = true
         html.required = true
