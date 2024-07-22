@@ -1,0 +1,32 @@
+name: Sonar Qube
+
+on:
+  push:
+    baranches:
+      - 'preprod'
+      - 'prod'
+      - 'main'
+      - 'dev'
+  pull_request:
+    branches:
+      - 'preprod'
+      - 'prod'
+      - 'main'
+      - 'dev'
+
+jobs:
+  trig-analyzing:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout repo
+          uses: actions/checkout@v4.1.6
+        - name: Setup Java
+          uses: actions/setup-java@v4.2.1
+          with:
+            java-version: '21'
+            distribution: 'corretto'
+        - name: SonarQube Scan
+          uses: sonarsource/sonarqube-scan-action@v2.3.0
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
