@@ -1,0 +1,2 @@
+implementation 'school.hei:patrimoine:1.0-SNAPSHOT'
+implementation 'com.harenako:harenako-api-gen:1.0.0'
