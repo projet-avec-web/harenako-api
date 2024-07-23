@@ -35,10 +35,11 @@ public class PossessionController {
     return ResponseEntity.ok().body(service.getPossessionByNom(nom_patrimoine, nom_possession));
   }
 
-  @PutMapping("/patrimoines")
+  @PutMapping("/patrimoines/{nom_patrimoine}/possessions")
   public ResponseEntity<?> crupdatePossessionInPatrimoine(
+      @PathVariable("nom_patrimoine") String nom_patrimoine,
       @RequestBody List<Patrimoine> possessions) {
-    return ResponseEntity.ok().body(service.crupdPossessions(possessions));
+    return ResponseEntity.ok().body(service.crupdPossessions(nom_patrimoine, possessions));
   }
 
   @DeleteMapping("/patrimoines/{nom_patrimoine}/possessions/{nom_possession}")
