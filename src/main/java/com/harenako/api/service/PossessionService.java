@@ -18,7 +18,7 @@ public class PossessionService {
     return "get possession by nom: not implemented";
   }
 
-  public String crupdPossessions(List<Patrimoine> patrimoines) {
+  public String crupdPossessions(String nom_patrimoine, List<Patrimoine> patrimoines) {
     return "create possessions: not implemented";
   }
 

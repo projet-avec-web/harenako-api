@@ -24,7 +24,7 @@ public class ProjectionFutureController {
         .body(service.getPatrimoineFluxImpossibles(nom_patrimoine, debut, fin));
   }
 
-  @GetMapping()
+  @GetMapping("/patrimoines/{nom_patrimoine}/graphe")
   public ResponseEntity<?> getPatrimoineGraph(
       @PathVariable("nom_patrimoine") String nom_patrimoine,
       @PathParam("debut") String debut,
