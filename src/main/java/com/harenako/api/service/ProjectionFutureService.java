@@ -3,10 +3,7 @@ package com.harenako.api.service;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.harenako.api.PojaGenerated;
-
 @Service
-@PojaGenerated
 @NoArgsConstructor
 public class ProjectionFutureService {
 

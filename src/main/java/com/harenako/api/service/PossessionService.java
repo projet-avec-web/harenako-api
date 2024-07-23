@@ -1,13 +1,11 @@
 package com.harenako.api.service;
 
-import com.harenako.api.PojaGenerated;
 import com.harenako.api.endpoint.rest.model.Patrimoine;
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@PojaGenerated
 @NoArgsConstructor
 public class PossessionService {
   public String getPossessions(String nom_patrimoine) {

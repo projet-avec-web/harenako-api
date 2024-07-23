@@ -2,7 +2,6 @@ package com.harenako.api.service;
 
 import static java.io.File.createTempFile;
 
-import com.harenako.api.PojaGenerated;
 import com.harenako.api.endpoint.rest.model.Patrimoine;
 import com.harenako.api.file.BucketComponent;
 import java.io.File;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import school.hei.patrimoine.serialisation.Serialiseur;
 
 @Service
-@PojaGenerated
 @AllArgsConstructor
 public class PatrimoineService {
   @SuppressWarnings({"rawtypes", "unchecked"})

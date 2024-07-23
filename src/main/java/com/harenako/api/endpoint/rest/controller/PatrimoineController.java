@@ -1,6 +1,5 @@
 package com.harenako.api.endpoint.rest.controller;
 
-import com.harenako.api.PojaGenerated;
 import com.harenako.api.endpoint.rest.model.Patrimoine;
 import com.harenako.api.service.PatrimoineService;
 import jakarta.websocket.server.PathParam;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@PojaGenerated
 @RestController
 @AllArgsConstructor
 public class PatrimoineController {
@@ -22,13 +20,13 @@ public class PatrimoineController {
   @GetMapping("/patrimoines")
   public ResponseEntity<?> getPatrimoine(
       @PathParam("page") Integer page, @PathParam("pageSize") Integer pageSize) {
-    return ResponseEntity.ok(service.getPatrimoines());
+    return ResponseEntity.ok().body(service.getPatrimoines());
   }
 
   @GetMapping("/patrimoines/{nom_patrimoine}")
   public ResponseEntity<?> getPatrimoineByNom(
       @PathVariable("nom_patrimoine") String nom_patrimoine) {
-    return ResponseEntity.ok(service.getPatrimoineByNom(nom_patrimoine));
+    return ResponseEntity.ok().body(service.getPatrimoineByNom(nom_patrimoine));
   }
 
   @PutMapping("/patrimoines")
