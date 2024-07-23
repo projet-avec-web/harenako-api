@@ -90,7 +90,7 @@ public class PatrimoineService {
   }
 
   private Patrimoine getPatrimoine(String nom) {
-    String bucketKey = PATRIMOINE_KEY + nom;
+    String bucketKey = PATRIMOINE_KEY + nom + "/" + nom;
     File patrimoineFile = bucketComponent.download(bucketKey);
     return convertToPatrimoine(patrimoineFile);
   }
