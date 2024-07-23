@@ -2,7 +2,7 @@ package com.harenako.api.endpoint.rest.controller;
 
 import com.harenako.api.PojaGenerated;
 import com.harenako.api.endpoint.rest.model.Patrimoine;
-import com.harenako.api.service.patrimoine.PatrimoineService;
+import com.harenako.api.service.PatrimoineService;
 import jakarta.websocket.server.PathParam;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -22,21 +22,17 @@ public class PatrimoineController {
   @GetMapping("/patrimoines")
   public ResponseEntity<?> getPatrimoine(
       @PathParam("page") Integer page, @PathParam("pageSize") Integer pageSize) {
-    return ResponseEntity.ok("get patrimoines");
+    return ResponseEntity.ok(service.getPatrimoines());
   }
 
   @GetMapping("/patrimoines/{nom_patrimoine}")
   public ResponseEntity<?> getPatrimoineByNom(
       @PathVariable("nom_patrimoine") String nom_patrimoine) {
-    return ResponseEntity.ok("get one patrimoines");
+    return ResponseEntity.ok(service.getPatrimoineByNom(nom_patrimoine));
   }
 
   @PutMapping("/patrimoines")
   public ResponseEntity<?> crupdatePatrimoine(@RequestBody List<Patrimoine> patrimoines) {
-    List<Patrimoine> patrimoineResults = service.crupdPatrimoines(patrimoines);
-    if (patrimoineResults != null) {
-      return ResponseEntity.ok(patrimoineResults);
-    }
-    return ResponseEntity.status(500).body("Internal Server Error");
+    return ResponseEntity.ok().body(service.crupdPatrimoines(patrimoines));
   }
 }

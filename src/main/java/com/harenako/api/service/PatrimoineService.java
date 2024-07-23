@@ -1,4 +1,4 @@
-package com.harenako.api.service.patrimoine;
+package com.harenako.api.service;
 
 import static java.io.File.createTempFile;
 
@@ -6,7 +6,6 @@ import com.harenako.api.PojaGenerated;
 import com.harenako.api.endpoint.rest.model.Patrimoine;
 import com.harenako.api.file.BucketComponent;
 import java.io.File;
-import java.time.Duration;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,17 +16,18 @@ import school.hei.patrimoine.serialisation.Serialiseur;
 @PojaGenerated
 @AllArgsConstructor
 public class PatrimoineService {
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private final Serialiseur<Patrimoine> serialiseur = new Serialiseur();
+
   private BucketComponent bucketComponent;
   private final String PATRIMOINE_KEY = "patriomines/";
 
-  public List<Patrimoine> getPatrimoines() {
-    bucketComponent.download(PATRIMOINE_KEY);
-    return null;
+  public String getPatrimoines() {
+    File allPatrimoineFile = bucketComponent.download(PATRIMOINE_KEY);
+    return allPatrimoineFile.getAbsolutePath();
   }
 
   public Patrimoine getPatrimoineByNom(String nom) {
-    ;
     String patrimoineString = bucketComponent.download(PATRIMOINE_KEY + nom).getName();
     return serialiseur.deserialise(patrimoineString);
   }
@@ -37,9 +37,7 @@ public class PatrimoineService {
     for (Patrimoine patrimoine : patrimoines) {
       String patrimoineString = serialiseur.serialise(patrimoine);
       File patrimoineFile = createTempFile(patrimoineString, "");
-      bucketComponent.upload(patrimoineFile, PATRIMOINE_KEY);
-      System.out.println(
-          bucketComponent.presign(PATRIMOINE_KEY + patrimoineString, Duration.ofMinutes(2)));
+      bucketComponent.upload(patrimoineFile, PATRIMOINE_KEY + patrimoine.getNom());
     }
     return patrimoines;
   }
