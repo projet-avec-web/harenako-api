@@ -27,7 +27,6 @@ jobs:
 
     env:
       AWS_REGION: eu-west-3
-      CODEARTIFACT_AUTH_TOKEN: ${{ secrets.CODEARTIFACT_AUTH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4.1.6
