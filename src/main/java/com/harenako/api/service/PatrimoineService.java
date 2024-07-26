@@ -12,12 +12,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.patrimoine.serialisation.Serialiseur;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
@@ -46,27 +49,29 @@ public class PatrimoineService {
       allPatrimoineFiles.add(patrimoineFile);
     }
 
-    List<Patrimoine> patrimoines = new ArrayList<>();
-    for (File file : allPatrimoineFiles) {
-      Patrimoine patrimoine = convertToPatrimoine(file);
-      patrimoines.add(patrimoine);
-    }
-
-    return patrimoines;
+    return allPatrimoineFiles.stream()
+        .map(f -> convertToPatrimoine(f))
+        .collect(Collectors.toList());
   }
 
   public Patrimoine getPatrimoineByNom(String nom) {
     String bucketKey = PATRIMOINE_KEY + nom + "/" + nom;
-    File patrimoineFile = bucketComponent.download(bucketKey);
-    if (patrimoineFile == null) {
+    try {
+      File patrimoineFile = bucketComponent.download(bucketKey);
+      if (patrimoineFile == null) return null;
+      return convertToPatrimoine(patrimoineFile);
+    } catch (NoSuchKeyException e) {
+      System.err.println("File not found in S3 bucket for key: " + bucketKey);
       return null;
+    } catch (S3Exception e) {
+      throw new RuntimeException(
+          "Error occurred while finding patrimoine file for key: " + bucketKey, e);
     }
-    return convertToPatrimoine(patrimoineFile);
   }
 
   public List<Patrimoine> crupdPatrimoines(List<Patrimoine> patrimoines) {
     for (Patrimoine patrimoine : patrimoines) {
-      if (getPatrimoineByNom(patrimoine.getNom()) != null) deletePatrimoine(patrimoine.getNom());
+      deletePatrimoine(patrimoine.getNom());
       createPatrimoine(patrimoine);
     }
     return patrimoines;
