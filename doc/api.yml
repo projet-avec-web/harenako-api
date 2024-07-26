@@ -101,8 +101,6 @@ paths:
       summary: met à jour une possession d'un patrimoine si le nom existe, sinon on le crée
       parameters:
         - $ref: "#/components/parameters/nom_patrimoine"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/page_size"
       requestBody:
         description: liste de possessions à ajouter ou à modifier
         content:
