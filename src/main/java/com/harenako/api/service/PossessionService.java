@@ -1,7 +1,6 @@
 package com.harenako.api.service;
 
 import static java.nio.file.Files.createTempDirectory;
-
 import com.harenako.api.endpoint.rest.model.Possession;
 import com.harenako.api.file.BucketComponent;
 import com.harenako.api.file.BucketConf;
