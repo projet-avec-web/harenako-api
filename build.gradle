@@ -10,14 +10,20 @@ plugins {
 
     id 'jacoco'
 
-    
+    id "org.sonarqube" version "5.1.0.4882"
 }
 
 jacoco {
     toolVersion = "0.8.11"
 }
 
-
+sonar {
+    properties {
+        property "sonar.projectKey", System.env.SONAR_PROJECT_KEY
+        property "sonar.host.url", System.env.SONAR_HOST_URL
+        property "sonar.organization", System.env.SONAR_ORG
+    }
+}
 
 repositories {
     mavenLocal()

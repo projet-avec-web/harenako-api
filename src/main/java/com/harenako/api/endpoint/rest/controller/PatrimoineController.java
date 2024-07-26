@@ -1,6 +1,5 @@
 package com.harenako.api.endpoint.rest.controller;
 
-import com.harenako.api.PojaGenerated;
 import com.harenako.api.endpoint.rest.model.Patrimoine;
 import com.harenako.api.service.PatrimoineService;
 import java.util.List;
@@ -13,16 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@PojaGenerated
 @RestController
 @AllArgsConstructor
 public class PatrimoineController {
   private PatrimoineService service;
-
-  @GetMapping("/patrimoines/ping")
-  public String patrimoines() {
-    return "patrimoines api";
-  }
 
   @GetMapping("/patrimoines")
   public ResponseEntity<?> getPatrimoine(
@@ -36,7 +29,7 @@ public class PatrimoineController {
     return ResponseEntity.ok().body(service.getPatrimoineByNom(nom_patrimoine));
   }
 
-  @PutMapping("/patrimoines/{nom_patrimoine}")
+  @PutMapping("/patrimoines")
   public ResponseEntity<?> crupdatePatrimoine(@RequestBody List<Patrimoine> patrimoines) {
     return ResponseEntity.ok().body(service.crupdPatrimoines(patrimoines));
   }
