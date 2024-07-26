@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.patrimoine.serialisation.Serialiseur;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -57,11 +58,15 @@ public class PatrimoineService {
   public Patrimoine getPatrimoineByNom(String nom) {
     String bucketKey = PATRIMOINE_KEY + nom + "/" + nom;
     File patrimoineFile = bucketComponent.download(bucketKey);
+    if (patrimoineFile == null) {
+      return null;
+    }
     return convertToPatrimoine(patrimoineFile);
   }
 
   public List<Patrimoine> crupdPatrimoines(List<Patrimoine> patrimoines) {
     for (Patrimoine patrimoine : patrimoines) {
+      if (getPatrimoineByNom(patrimoine.getNom()) != null) deletePatrimoine(patrimoine.getNom());
       createPatrimoine(patrimoine);
     }
     return patrimoines;
@@ -80,6 +85,16 @@ public class PatrimoineService {
     } catch (IOException e) {
       throw new RuntimeException("Error creating patrimoine file", e);
     }
+  }
+
+  public void deletePatrimoine(String nom) {
+    String bucketKey = PATRIMOINE_KEY + nom + "/" + nom;
+    DeleteObjectRequest deleteObjectRequest =
+        DeleteObjectRequest.builder()
+            .bucket(bucketComponent.getBucketName())
+            .key(bucketKey)
+            .build();
+    bucketConf.getS3Client().deleteObject(deleteObjectRequest);
   }
 
   private Patrimoine convertToPatrimoine(File file) {

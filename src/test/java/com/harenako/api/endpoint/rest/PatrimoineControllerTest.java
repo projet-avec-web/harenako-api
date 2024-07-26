@@ -45,7 +45,7 @@ public class PatrimoineControllerTest {
 
   @Test
   public void testGetPatrimoineByNom() {
-    String nomPatrimoine = "Test1";
+    String nomPatrimoine = "patrimoine-test";
     Patrimoine patrimoine = new Patrimoine();
     patrimoine.setNom(nomPatrimoine);
 
