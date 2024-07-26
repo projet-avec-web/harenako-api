@@ -72,9 +72,9 @@ public class PossessionService {
   private void createPossession(String nom_patrimoine, Possession possession) {
     try {
       String possessionStr = serialiseur.serialise(possession);
-      String possessionDirectory = "possessions";
+      String possessionDirectory = possession.getNom();
       File possessionDirectoryToUpload = createTempDirectory(possessionDirectory).toFile();
-      File possessionFile = new File(possessionDirectoryToUpload, possession.getNom());
+      File possessionFile = new File(possession.getNom());
       writeContent(possessionStr, possessionFile);
       String directoryBucketKey =
           PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + possession.getNom();
