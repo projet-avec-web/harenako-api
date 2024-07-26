@@ -75,10 +75,10 @@ public class PossessionService {
       String possessionStr = serialiseur.serialise(possession);
       String possessionDirectory = possession.getNom();
       File possessionDirectoryToUpload = createTempDirectory(possessionDirectory).toFile();
-      File possessionFile = new File(possessionDirectory);
+      File possessionFile =
+          new File(possessionDirectoryToUpload.getAbsolutePath() + "/" + possession.getNom());
       writeContent(possessionStr, possessionFile);
-      String directoryBucketKey =
-          PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + possessionDirectory;
+      String directoryBucketKey = PATRIMOINE_KEY + nom_patrimoine + "/possessions/";
       bucketComponent.upload(possessionDirectoryToUpload, directoryBucketKey);
     } catch (IOException e) {
       throw new RuntimeException("Error creating possession file", e);
