@@ -1,7 +1,6 @@
 package com.harenako.api.endpoint.rest.controller;
 
-import com.harenako.api.PojaGenerated;
-import com.harenako.api.endpoint.rest.model.Patrimoine;
+import com.harenako.api.endpoint.rest.model.Possession;
 import com.harenako.api.service.PossessionService;
 import jakarta.websocket.server.PathParam;
 import java.util.List;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@PojaGenerated
 @RestController
 @AllArgsConstructor
 public class PossessionController {
@@ -38,7 +36,7 @@ public class PossessionController {
   @PutMapping("/patrimoines/{nom_patrimoine}/possessions")
   public ResponseEntity<?> crupdatePossessionInPatrimoine(
       @PathVariable("nom_patrimoine") String nom_patrimoine,
-      @RequestBody List<Patrimoine> possessions) {
+      @RequestBody List<Possession> possessions) {
     return ResponseEntity.ok().body(service.crupdPossessions(nom_patrimoine, possessions));
   }
 
@@ -46,6 +44,6 @@ public class PossessionController {
   public ResponseEntity<?> deletePossessionByNomByPatrimoine(
       @PathVariable("nom_patrimoine") String nom_patrimoine,
       @PathVariable("nom_possession") String nom_possession) {
-    return ResponseEntity.ok().body(service.removePossession(nom_patrimoine, nom_possession));
+    return ResponseEntity.ok().body(service.deletePossession(nom_patrimoine, nom_possession));
   }
 }
