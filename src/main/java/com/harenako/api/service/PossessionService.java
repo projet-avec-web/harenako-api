@@ -77,6 +77,7 @@ public class PossessionService {
       writeContent(possessionStr, possessionFile);
       String directoryBucketKey =
           PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + possession.getNom();
+      System.out.println("Uploading to S3 with key: " + directoryBucketKey);
       bucketComponent.upload(possessionFile, directoryBucketKey);
     } catch (IOException e) {
       throw new RuntimeException("Error creating possession file", e);
