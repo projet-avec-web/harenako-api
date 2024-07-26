@@ -1,6 +1,6 @@
 package com.harenako.api.service;
 
-import static java.io.File.createTempFile;
+import static java.nio.file.Files.createTempDirectory;
 
 import com.harenako.api.endpoint.rest.model.Possession;
 import com.harenako.api.file.BucketComponent;
@@ -73,12 +73,13 @@ public class PossessionService {
   private void createPossession(String nom_patrimoine, Possession possession) {
     try {
       String possessionStr = serialiseur.serialise(possession);
-      File possessionFile = createTempFile(possession.getNom(), "");
+      String possessionDirectory = possession.getNom();
+      File possessionDirectoryToUpload = createTempDirectory(possessionDirectory).toFile();
+      File possessionFile = new File(possessionDirectory);
       writeContent(possessionStr, possessionFile);
       String directoryBucketKey =
-          PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + possession.getNom();
-      System.out.println("Uploading to S3 with key: " + directoryBucketKey);
-      bucketComponent.upload(possessionFile, directoryBucketKey);
+          PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + possessionDirectory;
+      bucketComponent.upload(possessionDirectoryToUpload, directoryBucketKey);
     } catch (IOException e) {
       throw new RuntimeException("Error creating possession file", e);
     }
