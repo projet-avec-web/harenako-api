@@ -20,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import school.hei.patrimoine.serialisation.Serialiseur;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -132,6 +134,15 @@ public class PatrimoineServiceTest {
     try (FileWriter writer = new FileWriter(file)) {
       writer.write(content);
     }
+  }
+
+  @Test
+  public void testDeletePatrimoine() {
+    String nom = "patrimoine-test";
+    when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(DeleteObjectResponse.builder().build());
+    service.deletePatrimoine(nom);
+    assertNull(service.getPatrimoineByNom(nom));
   }
 
   private String mockDataSerialiser() {
