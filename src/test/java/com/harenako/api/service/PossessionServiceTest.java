@@ -47,9 +47,13 @@ public class PossessionServiceTest {
     String nom_patrimoine = "patrimoine-test";
     List<S3Object> s3Objects = new ArrayList<>();
     s3Objects.add(
-        S3Object.builder().key("patrimoines/" + nom_patrimoine + "/possessions/possess1").build());
+        S3Object.builder()
+            .key("patrimoines/patrimoine_" + nom_patrimoine + "/possessions/possess1")
+            .build());
     s3Objects.add(
-        S3Object.builder().key("patrimoines/" + nom_patrimoine + "/possessions/possess2").build());
+        S3Object.builder()
+            .key("patrimoines/patrimoine_" + nom_patrimoine + "/possessions/possess2")
+            .build());
 
     ListObjectsV2Response listObjectsResponse =
         ListObjectsV2Response.builder().contents(s3Objects).build();

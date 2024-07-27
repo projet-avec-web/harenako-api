@@ -1,5 +1,7 @@
 package com.harenako.api.service;
 
+import static java.io.File.createTempFile;
+
 import com.harenako.api.endpoint.rest.model.Possession;
 import com.harenako.api.file.BucketComponent;
 import com.harenako.api.file.BucketConf;
@@ -30,34 +32,35 @@ public class PossessionService {
   public List<Possession> getPossessions(String nom_patrimoine) {
     List<File> allPossessionsFiles = new ArrayList<>();
 
-    ListObjectsV2Request listObjectsReqManual =
-        ListObjectsV2Request.builder()
-            .bucket(bucketComponent.getBucketName())
-            .prefix(PATRIMOINE_KEY + nom_patrimoine + "/possessions/")
-            .build();
+    try {
+      ListObjectsV2Request listObjectsReqManual =
+          ListObjectsV2Request.builder()
+              .bucket(bucketComponent.getBucketName())
+              .prefix(PATRIMOINE_KEY + "patrimoine_" + nom_patrimoine + "/possessions/")
+              .build();
 
-    ListObjectsV2Response listObjResponse =
-        bucketConf.getS3Client().listObjectsV2(listObjectsReqManual);
+      ListObjectsV2Response listObjResponse =
+          bucketConf.getS3Client().listObjectsV2(listObjectsReqManual);
 
-    for (S3Object s3Object : listObjResponse.contents()) {
-      String key = s3Object.key();
-      File possessionFile = bucketComponent.download(key);
-      allPossessionsFiles.add(possessionFile);
+      for (S3Object s3Object : listObjResponse.contents()) {
+        String key = s3Object.key();
+        if (key.startsWith(PATRIMOINE_KEY + "patrimoine_" + nom_patrimoine + "/possessions/")) {
+          File possessionFile = bucketComponent.download(key);
+          if (possessionFile != null) {
+            allPossessionsFiles.add(possessionFile);
+          }
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Error on load possessions file: ", e);
     }
 
-    List<Possession> possessions = new ArrayList<>();
-    for (File file : allPossessionsFiles) {
-      Possession possession = convertToPossession(file);
-      possessions.add(possession);
-    }
-
-    return allPossessionsFiles.stream()
-        .map(f -> convertToPossession(f))
-        .collect(Collectors.toList());
+    return allPossessionsFiles.stream().map(this::convertToPossession).collect(Collectors.toList());
   }
 
   public Possession getPossessionByNom(String nom_patrimoine, String nom_possession) {
-    String bucketKey = PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + nom_possession;
+    String bucketKey =
+        PATRIMOINE_KEY + "patrimoine_" + nom_patrimoine + "/possessions/" + nom_possession;
     File possessionFile = bucketComponent.download(bucketKey);
     if (possessionFile == null) return null;
     return convertToPossession(possessionFile);
@@ -74,10 +77,10 @@ public class PossessionService {
   private void createPossession(String nom_patrimoine, Possession possession) {
     try {
       String possessionStr = serialiseur.serialise(possession);
-      File possessionFile = new File(possession.getNom());
+      File possessionFile = createTempFile(possession.getNom(), "");
       writeContent(possessionStr, possessionFile);
       String directoryBucketKey =
-          PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + possession.getNom();
+          PATRIMOINE_KEY + "patrimoine_" + nom_patrimoine + "/possessions/" + possession.getNom();
       bucketComponent.upload(possessionFile, directoryBucketKey);
     } catch (IOException e) {
       throw new RuntimeException("Error creating possession file", e);
