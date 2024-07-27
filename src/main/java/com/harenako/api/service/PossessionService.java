@@ -17,8 +17,6 @@ import school.hei.patrimoine.serialisation.Serialiseur;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
@@ -60,17 +58,9 @@ public class PossessionService {
 
   public Possession getPossessionByNom(String nom_patrimoine, String nom_possession) {
     String bucketKey = PATRIMOINE_KEY + nom_patrimoine + "/possessions/" + nom_possession;
-    try {
-      File possessionFile = bucketComponent.download(bucketKey);
-      if (possessionFile == null) return null;
-      return convertToPossession(possessionFile);
-    } catch (NoSuchKeyException e) {
-      System.err.println("File not found in S3 bucket for key: " + bucketKey);
-      return null;
-    } catch (S3Exception e) {
-      throw new RuntimeException(
-          "Error occurred while finding possession file for key: " + bucketKey, e);
-    }
+    File possessionFile = bucketComponent.download(bucketKey);
+    if (possessionFile == null) return null;
+    return convertToPossession(possessionFile);
   }
 
   public List<Possession> crupdPossessions(String nom_patrimoine, List<Possession> possessions) {

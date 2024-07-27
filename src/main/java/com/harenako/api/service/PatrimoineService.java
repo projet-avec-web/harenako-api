@@ -19,8 +19,6 @@ import school.hei.patrimoine.serialisation.Serialiseur;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
@@ -56,17 +54,9 @@ public class PatrimoineService {
 
   public Patrimoine getPatrimoineByNom(String nom) {
     String bucketKey = PATRIMOINE_KEY + nom + "/" + nom;
-    try {
-      File patrimoineFile = bucketComponent.download(bucketKey);
-      if (patrimoineFile == null) return null;
-      return convertToPatrimoine(patrimoineFile);
-    } catch (NoSuchKeyException e) {
-      System.err.println("File not found in S3 bucket for key: " + bucketKey);
-      return null;
-    } catch (S3Exception e) {
-      throw new RuntimeException(
-          "Error occurred while finding patrimoine file for key: " + bucketKey, e);
-    }
+    File patrimoineFile = bucketComponent.download(bucketKey);
+    if (patrimoineFile == null) return null;
+    return convertToPatrimoine(patrimoineFile);
   }
 
   public List<Patrimoine> crupdPatrimoines(List<Patrimoine> patrimoines) {
