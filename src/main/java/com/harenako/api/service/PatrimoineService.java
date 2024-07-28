@@ -44,7 +44,8 @@ public class PatrimoineService {
 
       for (S3Object s3Object : listObjResponse.contents()) {
         String key = s3Object.key();
-        if (key.startsWith(PATRIMOINE_KEY + "patrimoine")) {
+        String[] segments = key.split("/");
+        if (segments.length == 3 && segments[1].startsWith("patrimoine")) {
           File patrimoineFile = bucketComponent.download(key);
           if (patrimoineFile != null) {
             allPatrimoineFiles.add(patrimoineFile);
@@ -59,7 +60,7 @@ public class PatrimoineService {
   }
 
   public Patrimoine getPatrimoineByNom(String nom) {
-    String bucketKey = PATRIMOINE_KEY + "/patrimoine_" + nom + "/" + nom;
+    String bucketKey = PATRIMOINE_KEY + "patrimoine_" + nom + "/" + nom;
     File patrimoineFile = bucketComponent.download(bucketKey);
     if (patrimoineFile == null) return null;
     return convertToPatrimoine(patrimoineFile);
@@ -89,7 +90,7 @@ public class PatrimoineService {
   }
 
   public void deletePatrimoine(String nom) {
-    String bucketKey = PATRIMOINE_KEY + nom + "/patrimoine_" + nom;
+    String bucketKey = PATRIMOINE_KEY + "patrimoine_" + nom + "/" + nom;
     DeleteObjectRequest deleteObjectRequest =
         DeleteObjectRequest.builder()
             .bucket(bucketComponent.getBucketName())
