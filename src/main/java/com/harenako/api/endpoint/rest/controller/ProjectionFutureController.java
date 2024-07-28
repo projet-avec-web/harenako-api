@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @PojaGenerated
 @RestController
 @AllArgsConstructor
@@ -20,8 +22,9 @@ public class ProjectionFutureController {
       @PathVariable("nom_patrimoine") String nom_patrimoine,
       @PathParam("debut") String debut,
       @PathParam("fin") String fin) {
-    return ResponseEntity.ok()
-        .body(service.getPatrimoineFluxImpossibles(nom_patrimoine, debut, fin));
+    return ResponseEntity.of(
+            Optional.of(service.getPatrimoineFluxImpossibles(nom_patrimoine, debut, fin))
+    );
   }
 
   @GetMapping("/patrimoines/{nom_patrimoine}/graphe")
@@ -29,6 +32,8 @@ public class ProjectionFutureController {
       @PathVariable("nom_patrimoine") String nom_patrimoine,
       @PathParam("debut") String debut,
       @PathParam("fin") String fin) {
-    return ResponseEntity.ok().body(service.getPatrimoineGraph(nom_patrimoine, debut, fin));
+    return ResponseEntity.of(
+            Optional.of(service.getPatrimoineGraph(nom_patrimoine, debut, fin))
+    );
   }
 }
