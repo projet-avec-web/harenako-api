@@ -64,8 +64,10 @@ public class PatrimoineServiceTest {
   @Test
   public void testGetPatrimoines() throws IOException {
     List<S3Object> s3Objects = new ArrayList<>();
-    s3Objects.add(S3Object.builder().key("patrimoines/patrimoine-test1").build());
-    s3Objects.add(S3Object.builder().key("patrimoines/patrimoine-test2").build());
+    s3Objects.add(
+        S3Object.builder().key("patrimoines/patrimoine_patrimoine-test1/patrimoine-test1").build());
+    s3Objects.add(
+        S3Object.builder().key("patrimoines/patrimoine_patrimoine-test2/patrimoine-test2").build());
 
     ListObjectsV2Response listObjectsResponse =
         ListObjectsV2Response.builder().contents(s3Objects).build();
@@ -90,6 +92,7 @@ public class PatrimoineServiceTest {
 
     assertNotNull(actualPatrimoines);
     assertEquals(2, actualPatrimoines.size());
+    assertEquals(new Patrimoine(), actualPatrimoines.get(0));
 
     file1.delete();
     file2.delete();
@@ -98,6 +101,14 @@ public class PatrimoineServiceTest {
   @Test
   public void testGetPatrimoineByNom() throws IOException {
     String nom = "patrimoine-test";
+    S3Object s3Objects =
+        S3Object.builder().key("patrimoines/patrimoine_patrimoine-test/patrimoine-test").build();
+
+    ListObjectsV2Response listObjectsResponse =
+        ListObjectsV2Response.builder().contents(s3Objects).build();
+
+    when(s3Client.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listObjectsResponse);
+
     Patrimoine expectedPatrimoine = new Patrimoine();
     String serializedData = mockDataSerialiser();
 
