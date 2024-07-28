@@ -20,7 +20,6 @@ jobs:
 
     env:
       AWS_REGION: eu-west-3
-      CODEARTIFACT_AUTH_TOKEN: ${{ secrets.CODEARTIFACT_AUTH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4.1.6
@@ -33,19 +32,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'corretto'
-
-      - name: Configure AWS credentials
-        run: |
-          mkdir -p ~/.aws
-          echo '[poja]' >> ~/.aws/credentials
-          echo "aws_access_key_id = ${{ secrets.PREPROD_AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
-          echo "aws_secret_access_key = ${{ secrets.PREPROD_AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
-
-      - name: Get CodeArtifact Auth Token
-        run: |
-          export CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain harenako-api --domain-owner 779673422809 --region eu-west-3 --query authorizationToken --output text --profile poja)
-          echo "CODEARTIFACT_AUTH_TOKEN=${CODEARTIFACT_AUTH_TOKEN}" >> $GITHUB_ENV
-
       - run: chmod +x gradlew
       - run: ./gradlew test
 

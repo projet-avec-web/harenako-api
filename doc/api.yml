@@ -354,6 +354,10 @@ components:
           format: date
         valeur_comptable:
           type: integer
+        possessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PossessionAvecType"
     Argent:
       type: object
       allOf:
