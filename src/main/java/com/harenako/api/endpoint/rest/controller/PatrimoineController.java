@@ -23,10 +23,8 @@ public class PatrimoineController {
 
   @GetMapping("/patrimoines")
   public ResponseEntity<?> getPatrimoine(
-          @RequestParam("page") Integer page,
-          @RequestParam("pageSize") Integer pageSize
-  ) {
-    return ResponseEntity.ok().body((getPage(service.getPatrimoines(), page, pageSize)));
+      @RequestParam("page") Integer page, @RequestParam("page_size") Integer pageSize) {
+    return ResponseEntity.ok().body(service.getPatrimoines());
   }
 
   @GetMapping("/patrimoines/{nom_patrimoine}")

@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.patrimoine.serialisation.Serialiseur;
@@ -31,42 +32,43 @@ public class PatrimoineService {
   public List<Patrimoine> getPatrimoines() {
     List<File> allPatrimoineFiles = new ArrayList<>();
 
-    ListObjectsV2Request listObjectsReqManual =
-        ListObjectsV2Request.builder()
-            .bucket(bucketComponent.getBucketName())
-            .prefix(PATRIMOINE_KEY)
-            .build();
+    try {
+      ListObjectsV2Request listObjectsReqManual =
+          ListObjectsV2Request.builder()
+              .bucket(bucketComponent.getBucketName())
+              .prefix(PATRIMOINE_KEY)
+              .build();
 
-    ListObjectsV2Response listObjResponse =
-        bucketConf.getS3Client().listObjectsV2(listObjectsReqManual);
+      ListObjectsV2Response listObjResponse =
+          bucketConf.getS3Client().listObjectsV2(listObjectsReqManual);
 
-    for (S3Object s3Object : listObjResponse.contents()) {
-      String key = s3Object.key();
-      File patrimoineFile = bucketComponent.download(key);
-      allPatrimoineFiles.add(patrimoineFile);
+      for (S3Object s3Object : listObjResponse.contents()) {
+        String key = s3Object.key();
+        String[] segments = key.split("/");
+        if (segments.length == 3 && segments[1].startsWith("patrimoine")) {
+          File patrimoineFile = bucketComponent.download(key);
+          if (patrimoineFile != null) {
+            allPatrimoineFiles.add(patrimoineFile);
+          }
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Unexpected error occurred while listing objects: ", e);
     }
 
-    List<Patrimoine> patrimoines = new ArrayList<>();
-    for (File file : allPatrimoineFiles) {
-      Patrimoine patrimoine = convertToPatrimoine(file);
-      patrimoines.add(patrimoine);
-    }
-
-    return patrimoines;
+    return allPatrimoineFiles.stream().map(this::convertToPatrimoine).collect(Collectors.toList());
   }
 
   public Patrimoine getPatrimoineByNom(String nom) {
-    String bucketKey = PATRIMOINE_KEY + nom + "/" + nom;
+    String bucketKey = PATRIMOINE_KEY + "patrimoine_" + nom + "/" + nom;
     File patrimoineFile = bucketComponent.download(bucketKey);
-    if (patrimoineFile == null) {
-      return null;
-    }
+    if (patrimoineFile == null) return null;
     return convertToPatrimoine(patrimoineFile);
   }
 
   public List<Patrimoine> crupdPatrimoines(List<Patrimoine> patrimoines) {
     for (Patrimoine patrimoine : patrimoines) {
-      if (getPatrimoineByNom(patrimoine.getNom()) != null) deletePatrimoine(patrimoine.getNom());
+      deletePatrimoine(patrimoine.getNom());
       createPatrimoine(patrimoine);
     }
     return patrimoines;
@@ -75,7 +77,7 @@ public class PatrimoineService {
   private void createPatrimoine(Patrimoine patrimoine) {
     try {
       String patrimoineStr = serialiseur.serialise(patrimoine);
-      String patrimoineDirectory = patrimoine.getNom();
+      String patrimoineDirectory = "patrimoine_" + patrimoine.getNom();
       File patrimoineDirectoryToUpload = createTempDirectory(patrimoineDirectory).toFile();
       File patrimoineFile =
           new File(patrimoineDirectoryToUpload.getAbsolutePath() + "/" + patrimoine.getNom());
@@ -88,7 +90,7 @@ public class PatrimoineService {
   }
 
   public void deletePatrimoine(String nom) {
-    String bucketKey = PATRIMOINE_KEY + nom + "/" + nom;
+    String bucketKey = PATRIMOINE_KEY + "patrimoine_" + nom + "/" + nom;
     DeleteObjectRequest deleteObjectRequest =
         DeleteObjectRequest.builder()
             .bucket(bucketComponent.getBucketName())
