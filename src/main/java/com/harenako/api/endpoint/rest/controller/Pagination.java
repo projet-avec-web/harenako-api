@@ -12,11 +12,11 @@ public final class Pagination {
         if (pageSize == null || pageSize <= 0) {
             pageSize = sourceList.size();
         }
-        if (page == null || page <= 0) {
-            page = 1;
+        if (page == null || page < 0) {
+            page = 0;
         }
 
-        int fromIndex = (page - 1) * pageSize;
+        int fromIndex = page * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, sourceList.size());
         return sourceList.subList(fromIndex, toIndex);
     }
