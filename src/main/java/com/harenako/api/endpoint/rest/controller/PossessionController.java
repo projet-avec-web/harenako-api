@@ -21,7 +21,7 @@ public class PossessionController {
   @GetMapping("/patrimoines/{nom_patrimoine}/possessions")
   public ResponseEntity<?> getPossessionByPatrimoine(
       @PathParam("page") Integer page,
-      @PathParam("pageSize") Integer pageSize,
+      @PathParam("page_size") Integer pageSize,
       @PathVariable("nom_patrimoine") String nom_patrimoine) {
     return ResponseEntity.ok().body(service.getPossessions(nom_patrimoine));
   }
