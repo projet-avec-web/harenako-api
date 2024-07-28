@@ -4,6 +4,9 @@ import com.harenako.api.endpoint.rest.model.PossessionAvecType;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.Patrimoine;
+import school.hei.patrimoine.modele.possession.Argent;
+import school.hei.patrimoine.modele.possession.FluxArgent;
+import school.hei.patrimoine.modele.possession.Materiel;
 import school.hei.patrimoine.modele.possession.Possession;
 
 import java.util.HashSet;
@@ -14,15 +17,25 @@ import java.util.Set;
 @AllArgsConstructor
 public class PatrimoineObjectMapper implements ObjectMapper<Patrimoine, com.harenako.api.endpoint.rest.model.Patrimoine> {
     private PersonneObjectMapper personneObjectMapper;
-    private PossessionObjectMapper possessionObjectMapper;
+    private ArgentObjectMapper argentObjectMapper;
+    private FluxArgentObjectMapper fluxArgentObjectMapper;
+    private MaterielObjectMapper materielObjectMapper;
 
     @Override
     public Patrimoine toModel(com.harenako.api.endpoint.rest.model.Patrimoine patrimoine) {
         if (patrimoine == null) return null;
         Set<Possession> possessions = new HashSet<>();
+
         for (PossessionAvecType possession: Objects.requireNonNull(patrimoine.getPossessions())) {
-            possessions.add(possessionObjectMapper.toModel(possession));
+            if (Objects.equals(possession.getType(), PossessionAvecType.TypeEnum.ARGENT)) {
+                possessions.add(argentObjectMapper.toModel(possession.getArgent()));
+            } else if (Objects.equals(possession.getType(), PossessionAvecType.TypeEnum.FLUXARGENT)) {
+                possessions.add(fluxArgentObjectMapper.toModel(possession.getFluxArgent()));
+            } else if (Objects.equals(possession.getType(), PossessionAvecType.TypeEnum.MATERIEL)) {
+                possessions.add(materielObjectMapper.toModel(possession.getMateriel()));
+            } else return null;
         }
+
         return new Patrimoine(
                 patrimoine.getNom(),
                 personneObjectMapper.toModel(patrimoine.getPossesseur()),

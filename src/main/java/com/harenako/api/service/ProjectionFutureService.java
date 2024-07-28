@@ -2,9 +2,7 @@ package com.harenako.api.service;
 
 import com.harenako.api.PojaGenerated;
 import com.harenako.api.endpoint.rest.model.*;
-import com.harenako.api.service.mapper.PatrimoineObjectMapper;
-import com.harenako.api.service.mapper.PersonneObjectMapper;
-import com.harenako.api.service.mapper.PossessionObjectMapper;
+import com.harenako.api.service.mapper.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,14 +19,14 @@ import java.util.*;
 public class ProjectionFutureService {
   private PatrimoineObjectMapper patrimoineObjectMapper;
   private PatrimoineService patrimoineService;
-  private PossessionObjectMapper possessionObjectMapper;
+  private FluxArgentObjectMapper fluxArgentObjectMapper;
 
   public FluxImpossibles getPatrimoineFluxImpossibles(String nom_patrimoine, String debut, String fin) {
     Patrimoine patrimoine = patrimoineService.getPatrimoineByNom(nom_patrimoine);
     List<FluxArgent> fluxArgents = new ArrayList<>();
 
     for (PossessionAvecType possession : Objects.requireNonNull(patrimoine.getPossessions())) {
-      fluxArgents.add((FluxArgent) possessionObjectMapper.toModel(possession));
+      fluxArgents.add(possession.getFluxArgent());
     }
 
     return new FluxImpossibles()
