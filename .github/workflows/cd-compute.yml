@@ -41,6 +41,17 @@ jobs:
           secrets: ${{ toJSON(secrets) }}
           region: ${{ env.AWS_REGION }}
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PREPROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PREPROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Get CodeArtifact Auth Token and Set as Env Var
+        run: |
+          echo "CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain harenako-api --domain-owner 779673422809 --region ${{ vars.AWS_REGION }} --query authorizationToken --output text)" >> $GITHUB_ENV
+
       - name: Disable tests
         if: ${{ github.event.inputs.run_tests == 'no' }}
         run: |
