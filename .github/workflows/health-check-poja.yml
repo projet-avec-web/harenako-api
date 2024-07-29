@@ -34,8 +34,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ secrets.POJA_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.POJA_AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.PREPROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PREPROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
 
       - name: Connect to Private Codeartifact
