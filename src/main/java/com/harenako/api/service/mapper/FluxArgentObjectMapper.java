@@ -1,5 +1,6 @@
 package com.harenako.api.service.mapper;
 
+import com.harenako.api.PojaGenerated;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ public class FluxArgentObjectMapper implements ObjectMapper<FluxArgent, com.hare
     private DeviseObjectMapper deviseObjectMapper;
 
     @Override
+    @PojaGenerated
     public FluxArgent toModel(com.harenako.api.endpoint.rest.model.FluxArgent fluxArgent) {
         if (fluxArgent == null) return null;
         return new FluxArgent(
@@ -29,6 +31,13 @@ public class FluxArgentObjectMapper implements ObjectMapper<FluxArgent, com.hare
 
     @Override
     public com.harenako.api.endpoint.rest.model.FluxArgent toRestModel(FluxArgent fluxArgent) {
-        return null;
+        if (fluxArgent == null) return null;
+        return new com.harenako.api.endpoint.rest.model.FluxArgent()
+                .nom(fluxArgent.getNom()).argent(argentObjectMapper.toRestModel(fluxArgent.getArgent()))
+                .debut(fluxArgent.getDebut())
+                .fin(fluxArgent.getFin())
+                .fluxMensuel(fluxArgent.getFluxMensuel())
+                .dateDOperation(fluxArgent.getDateOperation())
+                .devise(deviseObjectMapper.toRestModel(fluxArgent.getDevise()));
     }
 }
