@@ -25,6 +25,9 @@ public class ArgentObjectMapper implements ObjectMapper<Argent, com.harenako.api
 
     @Override
     public com.harenako.api.endpoint.rest.model.Argent toRestModel(Argent argent) {
-        return null;
+        if (argent == null) return null;
+        return new com.harenako.api.endpoint.rest.model.Argent().nom(argent.getNom()).devise(
+                deviseObjectMapper.toRestModel(argent.getDevise())
+        ).dateDOuverture(argent.getDateOuverture()).valeurComptable(argent.getValeurComptable());
     }
 }

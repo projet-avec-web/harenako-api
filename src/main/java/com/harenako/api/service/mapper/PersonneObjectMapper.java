@@ -13,6 +13,7 @@ public class PersonneObjectMapper implements ObjectMapper<Personne, com.harenako
 
     @Override
     public com.harenako.api.endpoint.rest.model.Personne toRestModel(Personne personne) {
-        return null;
+        if (personne == null) return null;
+        return new com.harenako.api.endpoint.rest.model.Personne().nom(personne.nom());
     }
 }

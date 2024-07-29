@@ -29,6 +29,13 @@ public class FluxArgentObjectMapper implements ObjectMapper<FluxArgent, com.hare
 
     @Override
     public com.harenako.api.endpoint.rest.model.FluxArgent toRestModel(FluxArgent fluxArgent) {
-        return null;
+        if (fluxArgent == null) return null;
+        return new com.harenako.api.endpoint.rest.model.FluxArgent()
+                .nom(fluxArgent.getNom()).argent(argentObjectMapper.toRestModel(fluxArgent.getArgent()))
+                .debut(fluxArgent.getDebut())
+                .fin(fluxArgent.getFin())
+                .fluxMensuel(fluxArgent.getFluxMensuel())
+                .dateDOperation(fluxArgent.getDateOperation())
+                .devise(deviseObjectMapper.toRestModel(fluxArgent.getDevise()));
     }
 }

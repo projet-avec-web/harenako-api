@@ -27,6 +27,15 @@ public class DeviseObjectMapper implements ObjectMapper<Devise, com.harenako.api
 
     @Override
     public com.harenako.api.endpoint.rest.model.Devise toRestModel(Devise devise) {
-        return null;
+        if (devise == null) return null;
+        if (devise.nom().equalsIgnoreCase(Devise.MGA.nom())) {
+            return new com.harenako.api.endpoint.rest.model.Devise().nom(devise.nom()).code("MGA");
+        } else if (devise.nom().equalsIgnoreCase(Devise.EUR.nom())) {
+            return new com.harenako.api.endpoint.rest.model.Devise().nom(devise.nom()).code("EUR");
+        } else if (devise.nom().equalsIgnoreCase(Devise.CAD.nom())) {
+            return new com.harenako.api.endpoint.rest.model.Devise().nom(devise.nom()).code("CAD");
+        } else {
+            return new com.harenako.api.endpoint.rest.model.Devise().nom(devise.nom()).code("NON_NOMMEE");
+        }
     }
 }

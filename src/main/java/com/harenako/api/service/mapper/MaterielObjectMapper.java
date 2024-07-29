@@ -27,6 +27,10 @@ public class MaterielObjectMapper implements ObjectMapper<Materiel, com.harenako
 
     @Override
     public com.harenako.api.endpoint.rest.model.Materiel toRestModel(Materiel materiel) {
-        return null;
+        if (materiel == null) return null;
+        return new com.harenako.api.endpoint.rest.model.Materiel()
+                .nom(materiel.getNom())
+                .t(materiel.getT())
+                .valeurComptable(materiel.getValeurComptable());
     }
 }

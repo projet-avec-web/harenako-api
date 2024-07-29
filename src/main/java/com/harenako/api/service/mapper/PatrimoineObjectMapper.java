@@ -6,11 +6,12 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.Patrimoine;
+import school.hei.patrimoine.modele.possession.Argent;
+import school.hei.patrimoine.modele.possession.FluxArgent;
+import school.hei.patrimoine.modele.possession.Materiel;
 import school.hei.patrimoine.modele.possession.Possession;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @NoArgsConstructor
@@ -33,7 +34,7 @@ public class PatrimoineObjectMapper implements ObjectMapper<Patrimoine, com.hare
                 possessions.add(fluxArgentObjectMapper.toModel(possession.getFluxArgent()));
             } else if (Objects.equals(possession.getType(), PossessionAvecType.TypeEnum.MATERIEL)) {
                 possessions.add(materielObjectMapper.toModel(possession.getMateriel()));
-            } else return null;
+            }
         }
 
         return new Patrimoine(
@@ -46,6 +47,29 @@ public class PatrimoineObjectMapper implements ObjectMapper<Patrimoine, com.hare
 
     @Override
     public com.harenako.api.endpoint.rest.model.Patrimoine toRestModel(Patrimoine patrimoine) {
-        return null;
+        if (patrimoine == null) return null;
+        List<PossessionAvecType> possessions = new ArrayList<>();
+
+        patrimoine.possessions().forEach(possession -> {
+            if (possession instanceof Argent) {
+                possessions.add(new PossessionAvecType().type(PossessionAvecType.TypeEnum.ARGENT).argent(
+                        argentObjectMapper.toRestModel((Argent) possession)
+                ));
+            } else if (possession instanceof FluxArgent) {
+                possessions.add(new PossessionAvecType().type(PossessionAvecType.TypeEnum.FLUXARGENT).fluxArgent(
+                        fluxArgentObjectMapper.toRestModel((FluxArgent) possession)
+                ));
+            } else if (possession instanceof Materiel) {
+                possessions.add(new PossessionAvecType().type(PossessionAvecType.TypeEnum.MATERIEL).materiel(
+                        materielObjectMapper.toRestModel((Materiel) possession)
+                ));
+            }
+        });
+
+        return new com.harenako.api.endpoint.rest.model.Patrimoine()
+                .nom(patrimoine.nom())
+                .t(patrimoine.t())
+                .possesseur(personneObjectMapper.toRestModel(patrimoine.possesseur()))
+                .possessions(possessions);
     }
 }
