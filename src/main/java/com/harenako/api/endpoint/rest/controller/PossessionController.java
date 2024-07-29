@@ -1,12 +1,20 @@
 package com.harenako.api.endpoint.rest.controller;
 
-import com.harenako.api.endpoint.rest.model.Possession;
-import com.harenako.api.service.PossessionService;
 import jakarta.websocket.server.PathParam;
+// import com.harenako.api.endpoint.rest.model.Possession;
+import com.harenako.api.service.PossessionService;
+import com.harenako.api.service.mapper.ArgentObjectMapper;
+import com.harenako.api.service.mapper.FluxArgentObjectMapper;
+import com.harenako.api.service.mapper.MaterielObjectMapper;
+import com.harenako.api.endpoint.rest.model.PossessionAvecType.TypeEnum;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
+import school.hei.patrimoine.modele.possession.Possession;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +29,9 @@ import static com.harenako.api.endpoint.rest.controller.Pagination.getPage;
 @AllArgsConstructor
 public class PossessionController {
   private PossessionService service;
+  private ArgentObjectMapper argentMapper = new ArgentObjectMapper();
+  private FluxArgentObjectMapper fluxArgentMapper = new FluxArgentObjectMapper();
+  private MaterielObjectMapper materielMapper = new MaterielObjectMapper();
 
   @GetMapping("/patrimoines/{nom_patrimoine}/possessions")
   public ResponseEntity<?> getPossessionByPatrimoine(
@@ -44,7 +55,23 @@ public class PossessionController {
   @PutMapping("/patrimoines/{nom_patrimoine}/possessions")
   public ResponseEntity<?> crupdatePossessionInPatrimoine(
       @PathVariable("nom_patrimoine") String nom_patrimoine,
-      @RequestBody List<Possession> possessions) {
+      @RequestBody List<PossessionData> possessionDatas) {
+    List<Possession> possessions = new ArrayList<>();
+    for (PossessionData data : possessionDatas) {
+      switch (data.getType()) {
+        case TypeEnum.ARGENT:
+          possessions.add(argentMapper.toModel(data.getArgent()));
+          break;
+        case TypeEnum.FLUXARGENT:
+          possessions.add(fluxArgentMapper.toModel(data.getFluxArgent()));
+          break;
+        case TypeEnum.MATERIEL:
+          possessions.add(materielMapper.toModel(data.getMateriel()));
+          break;
+        default:
+          continue;
+      }
+    }
     return ResponseEntity.ok().body(service.crupdPossessions(nom_patrimoine, possessions));
   }
 

@@ -2,7 +2,6 @@ package com.harenako.api.service;
 
 import static java.io.File.createTempFile;
 
-import com.harenako.api.endpoint.rest.model.Possession;
 import com.harenako.api.file.BucketComponent;
 import com.harenako.api.file.BucketConf;
 import java.io.BufferedReader;
@@ -15,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import school.hei.patrimoine.modele.possession.Possession;
 import school.hei.patrimoine.serialisation.Serialiseur;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;

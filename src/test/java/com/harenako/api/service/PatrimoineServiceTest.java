@@ -6,19 +6,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.harenako.api.endpoint.rest.model.Patrimoine;
 import com.harenako.api.file.BucketComponent;
 import com.harenako.api.file.BucketConf;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import school.hei.patrimoine.modele.Patrimoine;
+import school.hei.patrimoine.modele.Personne;
 import school.hei.patrimoine.serialisation.Serialiseur;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
@@ -47,7 +52,7 @@ public class PatrimoineServiceTest {
   @Test
   public void testSerializationDeserialization() {
     Serialiseur<Patrimoine> serialiseur = new Serialiseur<>();
-    Patrimoine originalPatrimoine = new Patrimoine();
+    Patrimoine originalPatrimoine = new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of());
     String serializedData = serialiseur.serialise(originalPatrimoine);
 
     assertNotNull(serializedData, "Serialized data should not be null");
@@ -74,8 +79,8 @@ public class PatrimoineServiceTest {
 
     when(s3Client.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listObjectsResponse);
 
-    Patrimoine patrimoine1 = new Patrimoine();
-    Patrimoine patrimoine2 = new Patrimoine();
+    Patrimoine patrimoine1 = new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of());
+    Patrimoine patrimoine2 = new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of());
     String serializedData1 = mockDataSerialiser();
     String serializedData2 = mockDataSerialiser();
 
@@ -92,7 +97,7 @@ public class PatrimoineServiceTest {
 
     assertNotNull(actualPatrimoines);
     assertEquals(2, actualPatrimoines.size());
-    assertEquals(new Patrimoine(), actualPatrimoines.get(0));
+    assertEquals(patrimoine1, actualPatrimoines.get(0));
 
     file1.delete();
     file2.delete();
@@ -109,7 +114,7 @@ public class PatrimoineServiceTest {
 
     when(s3Client.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listObjectsResponse);
 
-    Patrimoine expectedPatrimoine = new Patrimoine();
+    Patrimoine expectedPatrimoine = new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of());
     String serializedData = mockDataSerialiser();
 
     File file = createTempFile(nom, "").toFile();
@@ -128,8 +133,8 @@ public class PatrimoineServiceTest {
 
   @Test
   public void testCrupdPatrimoines() {
-    Patrimoine patrimoine1 = new Patrimoine();
-    Patrimoine patrimoine2 = new Patrimoine();
+    Patrimoine patrimoine1 = new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of());
+    Patrimoine patrimoine2 = new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of());
     List<Patrimoine> patrimoines = List.of(patrimoine1, patrimoine2);
 
     when(bucketComponent.upload(any(File.class), anyString())).thenReturn(null);
@@ -158,7 +163,7 @@ public class PatrimoineServiceTest {
 
   private String mockDataSerialiser() {
     Serialiseur<Patrimoine> serialiseur = new Serialiseur<>();
-    Patrimoine originalPatrimoine = new Patrimoine();
+    Patrimoine originalPatrimoine = new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of());
     return serialiseur.serialise(originalPatrimoine);
   }
 }

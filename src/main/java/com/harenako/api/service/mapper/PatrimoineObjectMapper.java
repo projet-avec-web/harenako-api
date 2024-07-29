@@ -2,11 +2,10 @@ package com.harenako.api.service.mapper;
 
 import com.harenako.api.endpoint.rest.model.PossessionAvecType;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.Patrimoine;
-import school.hei.patrimoine.modele.possession.Argent;
-import school.hei.patrimoine.modele.possession.FluxArgent;
-import school.hei.patrimoine.modele.possession.Materiel;
 import school.hei.patrimoine.modele.possession.Possession;
 
 import java.util.HashSet;
@@ -14,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Component
+@NoArgsConstructor
 @AllArgsConstructor
 public class PatrimoineObjectMapper implements ObjectMapper<Patrimoine, com.harenako.api.endpoint.rest.model.Patrimoine> {
     private PersonneObjectMapper personneObjectMapper;

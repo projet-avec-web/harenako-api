@@ -1,6 +1,5 @@
 package com.harenako.api.endpoint.rest.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class Pagination {

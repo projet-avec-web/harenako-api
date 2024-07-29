@@ -2,7 +2,7 @@ package com.harenako.api.service;
 
 import static java.nio.file.Files.createTempDirectory;
 
-import com.harenako.api.endpoint.rest.model.Patrimoine;
+import school.hei.patrimoine.modele.Patrimoine;
 import com.harenako.api.file.BucketComponent;
 import com.harenako.api.file.BucketConf;
 import java.io.BufferedReader;
@@ -68,7 +68,7 @@ public class PatrimoineService {
 
   public List<Patrimoine> crupdPatrimoines(List<Patrimoine> patrimoines) {
     for (Patrimoine patrimoine : patrimoines) {
-      deletePatrimoine(patrimoine.getNom());
+      deletePatrimoine(patrimoine.nom());
       createPatrimoine(patrimoine);
     }
     return patrimoines;
@@ -77,10 +77,10 @@ public class PatrimoineService {
   private void createPatrimoine(Patrimoine patrimoine) {
     try {
       String patrimoineStr = serialiseur.serialise(patrimoine);
-      String patrimoineDirectory = "patrimoine_" + patrimoine.getNom();
+      String patrimoineDirectory = "patrimoine_" + patrimoine.nom();
       File patrimoineDirectoryToUpload = createTempDirectory(patrimoineDirectory).toFile();
       File patrimoineFile =
-          new File(patrimoineDirectoryToUpload.getAbsolutePath() + "/" + patrimoine.getNom());
+          new File(patrimoineDirectoryToUpload.getAbsolutePath() + "/" + patrimoine.nom());
       writeContent(patrimoineStr, patrimoineFile);
       String directoryBucketKey = PATRIMOINE_KEY + patrimoineDirectory;
       bucketComponent.upload(patrimoineDirectoryToUpload, directoryBucketKey);

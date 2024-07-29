@@ -1,10 +1,13 @@
 package com.harenako.api.service.mapper;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.Argent;
 
 @Component
+@NoArgsConstructor
 @AllArgsConstructor
 public class ArgentObjectMapper implements ObjectMapper<Argent, com.harenako.api.endpoint.rest.model.Argent> {
     private DeviseObjectMapper deviseObjectMapper;

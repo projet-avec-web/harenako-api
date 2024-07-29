@@ -7,12 +7,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.harenako.api.endpoint.rest.model.Possession;
 import com.harenako.api.file.BucketComponent;
 import com.harenako.api.file.BucketConf;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import school.hei.patrimoine.modele.possession.Possession;
+import school.hei.patrimoine.modele.possession.Argent;
 import school.hei.patrimoine.serialisation.Serialiseur;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
@@ -59,8 +62,8 @@ public class PossessionServiceTest {
         ListObjectsV2Response.builder().contents(s3Objects).build();
     when(s3Client.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listObjectsResponse);
 
-    Possession possession1 = new Possession();
-    Possession possession2 = new Possession();
+    Possession possession1 = new Argent("possession-test", LocalDate.now(), 0);
+    Possession possession2 = new Argent("possession-test", LocalDate.now(), 0);
     String serializedData1 = mockDataSerialiser();
     String serializedData2 = mockDataSerialiser();
 
@@ -85,8 +88,8 @@ public class PossessionServiceTest {
   @Test
   public void testGetPossessionByNom() throws IOException {
     String nom_patrimoine = "patrimoine-test";
-    String nom_possession = "possess1";
-    Possession expectedPossession = new Possession();
+    String nom_possession = "possession-test";
+    Possession expectedPossession = new Argent("possession-test", LocalDate.now(), 0);
     String serializedData = mockDataSerialiser();
 
     File file = createTempFile(nom_possession, "").toFile();
@@ -106,17 +109,15 @@ public class PossessionServiceTest {
   @Test
   public void testCrupdPossessions() throws IOException {
     String nom_patrimoine = "patrimoine-test";
-    Possession possession1 = new Possession();
-    Possession possession2 = new Possession();
-    possession1.setNom("possess1");
-    possession2.setNom("possess2");
+    Possession possession1 = new Argent("possession-test", LocalDate.now(), 0);
+    Possession possession2 = new Argent("possession-test", LocalDate.now(), 0);
     List<Possession> possessions = List.of(possession1, possession2);
 
     String serializedData1 = mockDataSerialiser();
     String serializedData2 = mockDataSerialiser();
 
-    File file1 = createTempFile("possess1", "").toFile();
-    File file2 = createTempFile("possess2", "").toFile();
+    File file1 = createTempFile("possession-test1", "").toFile();
+    File file2 = createTempFile("possession-test2", "").toFile();
     writeContentToFile(file1, serializedData1);
     writeContentToFile(file2, serializedData2);
 
@@ -139,7 +140,7 @@ public class PossessionServiceTest {
   @Test
   public void testRemovePossession() {
     String nom_patrimoine = "patrimoine-test";
-    String nom_possession = "possess1";
+    String nom_possession = "possession-test";
 
     when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(DeleteObjectResponse.builder().build());
@@ -152,7 +153,7 @@ public class PossessionServiceTest {
   @Test
   public void testDeletePossession() {
     String nom_patrimoine = "patrimoine-test";
-    String nom_possession = "possess1";
+    String nom_possession = "possession-test";
     when(bucketComponent.download(anyString())).thenThrow(new RuntimeException("File not found"));
     service.deletePossession(nom_patrimoine, nom_possession);
     assertThrows(
@@ -170,7 +171,7 @@ public class PossessionServiceTest {
 
   private String mockDataSerialiser() {
     Serialiseur<Possession> serialiseur = new Serialiseur<>();
-    Possession originalPossession = new Possession();
+    Possession originalPossession = new Argent("possession-test", LocalDate.now(), 0);;
     return serialiseur.serialise(originalPossession);
   }
 }

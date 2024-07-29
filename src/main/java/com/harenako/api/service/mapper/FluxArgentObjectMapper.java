@@ -1,10 +1,13 @@
 package com.harenako.api.service.mapper;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.FluxArgent;
 
 @Component
+@NoArgsConstructor
 @AllArgsConstructor
 public class FluxArgentObjectMapper implements ObjectMapper<FluxArgent, com.harenako.api.endpoint.rest.model.FluxArgent> {
     private ArgentObjectMapper argentObjectMapper;

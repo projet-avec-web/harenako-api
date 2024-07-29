@@ -1,12 +1,14 @@
 package com.harenako.api.service;
 
 import com.harenako.api.PojaGenerated;
-import com.harenako.api.endpoint.rest.model.*;
-import com.harenako.api.service.mapper.*;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.patrimoine.modele.EvolutionPatrimoine;
+import school.hei.patrimoine.modele.FluxImpossibles;
+import school.hei.patrimoine.modele.Patrimoine;
+import school.hei.patrimoine.modele.possession.Argent;
+import school.hei.patrimoine.modele.possession.FluxArgent;
+import school.hei.patrimoine.modele.possession.Possession;
 import school.hei.patrimoine.visualisation.xchart.GrapheurEvolutionPatrimoine;
 
 import java.io.File;
@@ -17,28 +19,25 @@ import java.util.*;
 @PojaGenerated
 @AllArgsConstructor
 public class ProjectionFutureService {
-  private PatrimoineObjectMapper patrimoineObjectMapper;
   private PatrimoineService patrimoineService;
-  private FluxArgentObjectMapper fluxArgentObjectMapper;
+  private PossessionService possessionService;
 
   public FluxImpossibles getPatrimoineFluxImpossibles(String nom_patrimoine, String debut, String fin) {
     Patrimoine patrimoine = patrimoineService.getPatrimoineByNom(nom_patrimoine);
-    List<FluxArgent> fluxArgents = new ArrayList<>();
+    Set<FluxArgent> fluxArgents = new LinkedHashSet<>();
 
-    for (PossessionAvecType possession : Objects.requireNonNull(patrimoine.getPossessions())) {
-      fluxArgents.add(possession.getFluxArgent());
+    for (Possession possession : Objects.requireNonNull(possessionService.getPossessions(nom_patrimoine))) {
+      if (possession instanceof Argent) {
+        for (FluxArgent fluxArgent : ((Argent)possession).getFluxArgents()) fluxArgents.add(fluxArgent);
+      }
     }
 
-    return new FluxImpossibles()
-            .nomArgent(nom_patrimoine)
-            .date(LocalDate.parse(debut))
-            .valeurArgent(patrimoine.getValeurComptable())
-            .fluxArgents(fluxArgents);
+    return new FluxImpossibles( LocalDate.parse(debut), nom_patrimoine, patrimoine.getValeurComptable(), fluxArgents);
   }
 
   public File getPatrimoineGraph(String nom_patrimoine, String debut, String fin) {
     Patrimoine patrimoine = patrimoineService.getPatrimoineByNom(nom_patrimoine);
-    EvolutionPatrimoine evolutionPatrimoine = new EvolutionPatrimoine(nom_patrimoine, patrimoineObjectMapper.toModel(patrimoine), LocalDate.parse(debut), LocalDate.parse(fin));
+    EvolutionPatrimoine evolutionPatrimoine = new EvolutionPatrimoine(nom_patrimoine, patrimoine, LocalDate.parse(debut), LocalDate.parse(fin));
 
     GrapheurEvolutionPatrimoine grapheurEvolutionPatrimoine = new GrapheurEvolutionPatrimoine();
     return grapheurEvolutionPatrimoine.apply(evolutionPatrimoine);
