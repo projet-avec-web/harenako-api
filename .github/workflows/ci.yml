@@ -35,12 +35,12 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.POJA_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.POJA_AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.PREPROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PREPROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
       - name: Get CodeArtifact Auth Token and Set as Env Var
         run: |
-          echo "CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain harenako-api --domain-owner 779673422809 --region ${{ vars.ASW_REGION }} --query authorizationToken --output text)" >> $GITHUB_ENV
+          echo "CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain harenako-api --domain-owner 779673422809 --region ${{ vars.AWS_REGION }} --query authorizationToken --output text)" >> $GITHUB_ENV
       - run: chmod +x gradlew
       - run: ./gradlew test
 
