@@ -2,6 +2,7 @@ package com.harenako.api.endpoint.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.harenako.api.endpoint.rest.controller.PatrimoineController;
@@ -68,6 +69,7 @@ public class PatrimoineControllerTest {
     assertEquals(nomPatrimoine, responseBody.nom());
   }
 
+  @Test
   @Test
   public void testCrupdatePatrimoine() {
     List<Patrimoine> patrimoines = new ArrayList<>();
