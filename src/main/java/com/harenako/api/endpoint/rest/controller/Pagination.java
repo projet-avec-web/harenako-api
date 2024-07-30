@@ -1,22 +1,20 @@
 package com.harenako.api.endpoint.rest.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
-public final class Pagination {
-    public static <T> List<T> getPage(List<T> sourceList, Integer page, Integer pageSize) {
-        if (sourceList.isEmpty()) {
-            return sourceList;
-        }
+public class Pagination {
+    public static <T> Page<T> convertToPage(List<T> data, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = sourceList.size();
-        }
-        if (page == null || page < 0) {
-            page = 0;
-        }
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), data.size());
 
-        int fromIndex = page * pageSize;
-        int toIndex = Math.min(fromIndex + pageSize, sourceList.size());
-        return sourceList.subList(fromIndex, toIndex);
+        List<T> pageContent = data.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, data.size());
     }
 }

@@ -1,82 +1,79 @@
 package com.harenako.api.endpoint.rest.controller;
 
+import com.harenako.api.endpoint.rest.model.PossessionAvecType;
+import com.harenako.api.service.mapper.PossessionsObjectMapper;
 import jakarta.websocket.server.PathParam;
-// import com.harenako.api.endpoint.rest.model.Possession;
 import com.harenako.api.service.PossessionService;
-import com.harenako.api.service.mapper.ArgentObjectMapper;
-import com.harenako.api.service.mapper.FluxArgentObjectMapper;
-import com.harenako.api.service.mapper.MaterielObjectMapper;
-import com.harenako.api.endpoint.rest.model.PossessionAvecType.TypeEnum;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
-import school.hei.patrimoine.modele.possession.Possession;
 
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static com.harenako.api.endpoint.rest.controller.Pagination.getPage;
+import static com.harenako.api.endpoint.rest.controller.Pagination.convertToPage;
 
 @RestController
 @AllArgsConstructor
 public class PossessionController {
   private PossessionService service;
-  private ArgentObjectMapper argentMapper = new ArgentObjectMapper();
-  private FluxArgentObjectMapper fluxArgentMapper = new FluxArgentObjectMapper();
-  private MaterielObjectMapper materielMapper = new MaterielObjectMapper();
+  private PossessionsObjectMapper possessionsObjectMapper;
 
   @GetMapping("/patrimoines/{nom_patrimoine}/possessions")
-  public ResponseEntity<?> getPossessionByPatrimoine(
-      @PathParam("page") Integer page,
-      @PathParam("page_size") Integer pageSize,
-      @PathVariable("nom_patrimoine") String nom_patrimoine) {
-    return ResponseEntity.ok().body(
-            getPage(service.getPossessions(nom_patrimoine), page, pageSize)
-    );
+  public ResponseEntity<Page<PossessionAvecType>> getPossessionByPatrimoine(
+      @RequestParam(name = "page", defaultValue = "0") Integer page,
+      @RequestParam(name = "page_size", defaultValue = "10") Integer pageSize,
+      @PathVariable("nom_patrimoine") String nom_patrimoine
+  ) {
+    List<PossessionAvecType> patrimoines = possessionsObjectMapper.toRestModel(service.getPossessions(nom_patrimoine));
+    Page<PossessionAvecType> dataResponse = convertToPage(patrimoines, page, pageSize);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("X-Page-Number", String.valueOf(dataResponse.getTotalPages()));
+    headers.add("X-Page-Size", String.valueOf(dataResponse.getTotalElements()));
+
+    return ResponseEntity.ok()
+            .headers(headers)
+            .body(dataResponse);
   }
 
   @GetMapping("/patrimoines/{nom_patrimoine}/possessions/{nom_possession}")
-  public ResponseEntity<?> getPossessionByNomByPatrimoine(
+  public ResponseEntity<PossessionAvecType> getPossessionByNomByPatrimoine(
       @PathVariable("nom_patrimoine") String nom_patrimoine,
-      @PathVariable("nom_possession") String nom_possession) {
+      @PathVariable("nom_possession") String nom_possession
+  ) {
     return ResponseEntity.of(
-            Optional.of(service.getPossessionByNom(nom_patrimoine, nom_possession))
+            Optional.of(possessionsObjectMapper.toRestModel(
+                    List.of(service.getPossessionByNom(nom_patrimoine, nom_possession))
+            ).getFirst())
     );
   }
 
   @PutMapping("/patrimoines/{nom_patrimoine}/possessions")
-  public ResponseEntity<?> crupdatePossessionInPatrimoine(
+  public ResponseEntity<Page<PossessionAvecType>> crupdatePossessionInPatrimoine(
       @PathVariable("nom_patrimoine") String nom_patrimoine,
-      @RequestBody List<PossessionData> possessionDatas) {
-    List<Possession> possessions = new ArrayList<>();
-    for (PossessionData data : possessionDatas) {
-      switch (data.getType()) {
-        case TypeEnum.ARGENT:
-          possessions.add(argentMapper.toModel(data.getArgent()));
-          break;
-        case TypeEnum.FLUXARGENT:
-          possessions.add(fluxArgentMapper.toModel(data.getFluxArgent()));
-          break;
-        case TypeEnum.MATERIEL:
-          possessions.add(materielMapper.toModel(data.getMateriel()));
-          break;
-        default:
-          continue;
-      }
-    }
-    return ResponseEntity.ok().body(service.crupdPossessions(nom_patrimoine, possessions));
+      @RequestBody List<PossessionAvecType> possessions
+  ) {
+    Page<PossessionAvecType> dataResponse = convertToPage(
+            possessionsObjectMapper.toRestModel(service.crupdPossessions(nom_patrimoine, possessionsObjectMapper.toModel(possessions).stream().toList())),
+            0, possessions.size()
+    );
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("X-Page-Number", String.valueOf(dataResponse.getTotalPages()));
+    headers.add("X-Page-Size", String.valueOf(dataResponse.getTotalElements()));
+
+    return ResponseEntity.ok()
+            .headers(headers)
+            .body(dataResponse);
   }
 
   @DeleteMapping("/patrimoines/{nom_patrimoine}/possessions/{nom_possession}")
-  public ResponseEntity<?> deletePossessionByNomByPatrimoine(
+  public ResponseEntity<String> deletePossessionByNomByPatrimoine(
       @PathVariable("nom_patrimoine") String nom_patrimoine,
       @PathVariable("nom_possession") String nom_possession) {
     return ResponseEntity.ok().body(service.deletePossession(nom_patrimoine, nom_possession));

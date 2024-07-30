@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import com.harenako.api.endpoint.rest.controller.PossessionController;
-import com.harenako.api.endpoint.rest.controller.PossessionData;
 import com.harenako.api.endpoint.rest.model.PossessionAvecType.TypeEnum;
 import com.harenako.api.service.PossessionService;
 import com.harenako.api.service.mapper.ArgentObjectMapper;
 import com.harenako.api.service.mapper.FluxArgentObjectMapper;
 import com.harenako.api.service.mapper.MaterielObjectMapper;
 
+import org.springframework.boot.test.context.SpringBootTest;
 import school.hei.patrimoine.modele.possession.Argent;
 import school.hei.patrimoine.modele.possession.Possession;
 
@@ -26,7 +26,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 
+@SpringBootTest
 public class PossessionControllerTest {
+  // This test depends on the controller
+  @InjectMocks private PossessionController controller;
 
   private final String nom_patrimoine = "patrimoine-test";
 
@@ -38,7 +41,12 @@ public class PossessionControllerTest {
 
   @MockBean private MaterielObjectMapper materielMapper;
 
-  @InjectMocks private PossessionController controller;
+
+
+  private static List<Possession> possessions = List.of(
+          new Argent("possession-test", LocalDate.now(), 0),
+          new Argent("possession-test", LocalDate.now(), 0)
+  );
 
   @BeforeEach
   public void setUp() {
@@ -47,10 +55,6 @@ public class PossessionControllerTest {
 
   @Test
   public void testGetPossessionByPatrimoine() {
-    List<Possession> possessions = new ArrayList<>();
-    possessions.add(new Argent("possession-test", LocalDate.now(), 0));
-    possessions.add(new Argent("possession-test", LocalDate.now(), 0));
-
     when(service.getPossessions(nom_patrimoine)).thenReturn(possessions);
 
     ResponseEntity<?> response = controller.getPossessionByPatrimoine(0, 10, "patrimoine-test");
