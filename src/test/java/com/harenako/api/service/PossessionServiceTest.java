@@ -20,9 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import school.hei.patrimoine.modele.possession.Possession;
 import school.hei.patrimoine.modele.possession.Argent;
+import school.hei.patrimoine.modele.possession.Possession;
 import school.hei.patrimoine.serialisation.Serialiseur;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
@@ -171,7 +170,8 @@ public class PossessionServiceTest {
 
   private String mockDataSerialiser() {
     Serialiseur<Possession> serialiseur = new Serialiseur<>();
-    Possession originalPossession = new Argent("possession-test", LocalDate.now(), 0);;
+    Possession originalPossession = new Argent("possession-test", LocalDate.now(), 0);
+    ;
     return serialiseur.serialise(originalPossession);
   }
 }

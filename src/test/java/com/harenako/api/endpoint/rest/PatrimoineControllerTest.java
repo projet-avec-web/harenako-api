@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import com.harenako.api.endpoint.rest.controller.PatrimoineController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import school.hei.patrimoine.modele.Patrimoine;
+import com.harenako.api.endpoint.rest.model.Patrimoine;
+
 import com.harenako.api.service.PatrimoineService;
 import com.harenako.api.service.mapper.*;
 
@@ -15,7 +14,6 @@ import school.hei.patrimoine.modele.Personne;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,18 +22,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
-@SpringBootTest
 public class PatrimoineControllerTest {
-  @InjectMocks
-  private PatrimoineController controller;
 
-  @MockBean
-  private PatrimoineService service;
-
-  //@Autowired private
+  @Mock private PatrimoineService service;
+  
+  @Mock private PatrimoineObjectMapper mapper;
+  
+  @InjectMocks private PatrimoineController controller;
 
   @BeforeEach
   public void setUp() {
@@ -43,66 +39,61 @@ public class PatrimoineControllerTest {
     MockitoAnnotations.openMocks(this);
   }
 
-  private static List<Patrimoine> patrimoines = List.of(
-          new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of()),
-          new Patrimoine("patrimoine-test", new Personne("possesseur-test"), LocalDate.now(), Set.of())
+  private static List<school.hei.patrimoine.modele.Patrimoine> patrimoinesSchool = List.of(
+    new school.hei.patrimoine.modele.Patrimoine(null, null, null, Set.of(
+      new school.hei.patrimoine.modele.possession.Argent("argent", LocalDate.now(), 0))),
+    new school.hei.patrimoine.modele.Patrimoine(null, null, null, Set.of(
+      new school.hei.patrimoine.modele.possession.Argent("argent", LocalDate.now(), 0)))
   );
-
 
   @Test
   public void testGetPatrimoines() {
-    when(service.getPatrimoines()).thenReturn(patrimoines);
+    when(service.getPatrimoines()).thenReturn(patrimoinesSchool);
 
-    ResponseEntity<List<com.harenako.api.endpoint.rest.model.Patrimoine>> response = ResponseEntity.ok(
-
-    );
+    ResponseEntity<Page<Patrimoine>> response = controller.getPatrimoine(0, 10);
 
     assertNotNull(response, "La réponse ne doit pas être nulle.");
-    assertEquals(200, response.getStatusCode().value(), "Le code de statut de la réponse doit être 200.");
+    assertEquals(200, response.getStatusCodeValue(), "Le code de statut de la réponse doit être 200.");
 
-    List<Patrimoine> responseBody = response.getBody();
+    Page<Patrimoine> responseBody = response.getBody();
     assertNotNull(responseBody, "Le corps de la réponse ne doit pas être nul.");
-    assertEquals(2, responseBody.size(), "La taille du corps de la réponse doit être 2.");
+    assertEquals(2, responseBody.getContent().size(), "La taille du corps de la réponse doit être 2.");
   }
-
 
   @Test
   public void testGetPatrimoineByNom() {
     String nomPatrimoine = "patrimoine-test";
-    Patrimoine patrimoine = new Patrimoine(nomPatrimoine, new Personne("possesseur-test"), LocalDate.now(), Set.of());
+    school.hei.patrimoine.modele.Patrimoine patrimoine = new school.hei.patrimoine.modele.Patrimoine(nomPatrimoine, new Personne("possesseur-test"), LocalDate.now(), Set.of());
 
     when(service.getPatrimoineByNom(nomPatrimoine)).thenReturn(patrimoine);
 
-    ResponseEntity<?> response = controller.getPatrimoineByNom(nomPatrimoine);
+    ResponseEntity<Page<Patrimoine>> response = controller.getPatrimoineByNom(nomPatrimoine);
 
     assertNotNull(response, "La réponse ne doit pas être nulle.");
     assertEquals(200, response.getStatusCodeValue(), "Le code de statut de la réponse doit être 200.");
 
-    Patrimoine responseBody = (Patrimoine) response.getBody();
+    Page<Patrimoine> responseBody = response.getBody();
     assertNotNull(responseBody, "Le corps de la réponse ne doit pas être nul.");
-    assertEquals(nomPatrimoine, responseBody.nom(), "Le nom du patrimoine dans la réponse doit correspondre à celui attendu.");
+    assertEquals(nomPatrimoine, responseBody.get().findFirst().get(), "Le nom du patrimoine dans la réponse doit correspondre à celui attendu.");
   }
 
   @Test
-  public void testCrupdatePatrimoine() {
-    List<Patrimoine> patrimoineModels = patrimoines;
+  public void testCrupdatePatrimoines() {
+    List<Patrimoine> patrimoines = new ArrayList<>();
+    patrimoines.add(new Patrimoine());
+    patrimoines.add(new Patrimoine());
 
-    List<com.harenako.api.endpoint.rest.model.Patrimoine> patrimoineRequests = new ArrayList<>();
-    patrimoineRequests.add(new com.harenako.api.endpoint.rest.model.Patrimoine());
-    patrimoineRequests.add(new com.harenako.api.endpoint.rest.model.Patrimoine());
+    when(mapper.toModel(patrimoines.get(0))).thenReturn(patrimoinesSchool.get(0));
+    when(mapper.toModel(patrimoines.get(1))).thenReturn(patrimoinesSchool.get(1));
+    when(service.crupdPatrimoines(patrimoinesSchool)).thenReturn(patrimoinesSchool);
 
-    when(mapper.toModel(patrimoineRequests.get(0))).thenReturn(patrimoineModels.get(0));
-    when(mapper.toModel(patrimoineRequests.get(1))).thenReturn(patrimoineModels.get(1));
-    when(service.crupdPatrimoines(patrimoineModels)).thenReturn(patrimoineModels);
-
-    ResponseEntity<?> response = controller.crupdatePatrimoine(patrimoineRequests);
+    ResponseEntity<Page<Patrimoine>> response = controller.crupdatePatrimoine(patrimoines);
 
     assertNotNull(response, "La réponse ne doit pas être nulle.");
     assertEquals(200, response.getStatusCodeValue(), "Le code de statut de la réponse doit être 200.");
 
-    @SuppressWarnings("unchecked")
-    List<com.harenako.api.endpoint.rest.model.Patrimoine> responseBody = (List<com.harenako.api.endpoint.rest.model.Patrimoine>) response.getBody();
+    Page<Patrimoine> responseBody = response.getBody();
     assertNotNull(responseBody, "Le corps de la réponse ne doit pas être nul.");
-    assertEquals(2, responseBody.size(), "La taille du corps de la réponse doit être 2.");
+    assertEquals(2, responseBody.getSize(), "La taille du corps de la réponse doit être 2.");
   }
 }
